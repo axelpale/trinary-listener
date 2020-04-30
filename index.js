@@ -8,7 +8,7 @@
 //
 
 const VOCABULARY_FOR_1 = ['ok', 'yes', 'true', 'news', 'yeah', 'is', 'hughes', 'used', 'i am', 'kiss', 'use', 'positive', 'yes i did', 'yahoo', 'juice', 'judas', 'yes yes']
-const VOCABULARY_FOR_0 = ['maybe', 'unknown', 'dunno', 'not sure', 'maddie', 'i don\'t know']
+const VOCABULARY_FOR_0 = ['maybe', 'unknown', 'dunno', 'not sure', 'maddie', 'i don\'t know', 'mandy']
 const VOCABULARY_FOR_T = ['no', 'unlikely', 'false', 'know', 'no no', 'negative', 'nope']
 const VOCABULARY_FOR_ESC = ['stop', 'quit', 'go away']
 
