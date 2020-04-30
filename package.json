@@ -1,0 +1,27 @@
+{
+  "name": "listpal",
+  "version": "1.0.0",
+  "description": "List-reading voice-controlled bot",
+  "keywords": [
+    "recognition"
+  ],
+  "homepage": "https://axelpale.github.io/listpal/",
+  "main": "index.js",
+  "author": {
+    "name": "Akseli Palen",
+    "email": "akseli.palen@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/axelpale/listpal.git"
+  },
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "*"
+  },
+  "scripts": {
+    "start": "python3 -m http.server",
+    "lint": "standard && echo OK"
+  }
+}
