@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>List Pal</title>
+	<title>Trinary Listener</title>
   <link rel='shortcut icon' type='image/x-icon' href='favicon.ico'>
 	<link rel="stylesheet" href="style.css">
 	<!--[if IE]>
@@ -12,28 +12,27 @@
 
 <body id="home">
 
-	<h1>List Pal</h1>
+	<h1>Trinary listener</h1>
 
-  <p>Hi! I will speak a line in your list aloud and then wait for you to say <strong>"next"</strong> or <strong>"okay"</strong> before I speak the next line.</p>
+  <p>Hi! I will ask you did you do it and then listen your answer. I will repeat what I understood before I begin to listen you again.</p>
 
   <p>Begin our conversation by pressing "Start talk" button below the list. Your browser will ask you a permission to access your microphone.</p>
 
   <p><strong>Google Chrome</strong> 33 or greater is required. Also ensure both your microfone and speakers are working and loud enough.</p>
 
   <p>
-    <strong>next, okay</strong> - say the next line<br>
-    <strong>again, repeat</strong> - say the line again<br>
-    <strong>back, previous</strong> - say the previous line<br>
+    <strong>Commands:</strong><br>
+    <strong>yes, okay</strong> - feed 1<br>
+    <strong>maybe, unknown</strong> - feed 0<br>
+    <strong>no, negative</strong> - feed -1<br>
     <strong>stop</strong> - stop listening
   </p>
 
   <p>
-    Paste your list here:
+    The collected event data sequence:
+    <div id="listBox">
+    </div>
   </p>
-  <textarea id="listBox" rows="10" style="width: 30em">
-1.8
-2.8
-4.3</textarea>
 
   <div class="output"></div>
 

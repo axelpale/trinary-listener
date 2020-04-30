@@ -7,19 +7,41 @@
 // - Firefox limitations: https://stackoverflow.com/questions/39784986/speechrecognition-is-not-working-in-firefox
 //
 
-const VOCABULARY_FOR_NEXT = ['ok', 'okay', 'next', 'nixed', 'text', 'rick', 'nick']
+const VOCABULARY_FOR_1 = ['ok', 'yes', 'true', 'news', 'yeah', 'is', 'hughes', 'used', 'i am', 'kiss', 'use', 'positive', 'yes i did', 'yahoo', 'juice', 'judas', 'yes yes']
+const VOCABULARY_FOR_0 = ['maybe', 'unknown', 'dunno', 'not sure', 'maddie']
+const VOCABULARY_FOR_T = ['no', 'unlikely', 'false', 'know', 'no no', 'negative', 'nope']
+const VOCABULARY_FOR_ESC = ['stop', 'quit', 'go away']
 
-window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+const QUESTIONS = [
+  'Did you sleep well?',
+  'Are you ok?',
+  'Did you eat breakfast?',
+  'Do you feel tired?'
+]
+let questionIndex = 0
 
-var recognition = new window.SpeechRecognition();
-recognition.continuous = true;
-recognition.lang = 'en-US';
-recognition.interimResults = false;
-recognition.maxAlternatives = 3;
+// Compatibility
+const SpeechRecognition = window.webkitSpeechRecognition ||
+  window.SpeechRecognition
+const SpeechSynthesis = window.SpeechSynthesis || window.speechSynthesis;
 
-var synth = window.speechSynthesis;
-var voices = synth.getVoices();
-var voice = voices[0]
+// Setup recognition
+var recognition = new SpeechRecognition()
+recognition.continuous = true
+recognition.lang = 'en-US'
+recognition.interimResults = false
+recognition.maxAlternatives = 3
+
+// Wait on voices to be loaded before fetching list.
+// Browsers might load voices asynchronously.
+// See https://stackoverflow.com/a/22978802/638546
+let voices = []
+SpeechSynthesis.onvoiceschanged = function() {
+  voices = SpeechSynthesis.getVoices()
+  voices.forEach((voice, i) => {
+    console.log(i, voice.name)
+  })
+}
 
 var diagnostic = document.querySelector('.output');
 var bg = document.querySelector('html');
@@ -27,38 +49,39 @@ var listBox = document.querySelector('#listBox')
 
 var speak = (word, cb) => {
   var utterThis = new SpeechSynthesisUtterance(word);
-  utterThis.voice = voice
+  utterThis.voice = voices[49]
   utterThis.rate = 0.75 // speed
   utterThis.volume = 0.75
-  synth.speak(utterThis);
+  SpeechSynthesis.speak(utterThis);
 
   if (typeof cb !== 'function') cb = () => {}
   utterThis.onend = cb
 }
 
+
 var hasAny = (list, words) => {
   return words.some(w => list.indexOf(w) !== -1)
 }
 
-var list = []
+const askQuestion = (cb) => {
+  speak(QUESTIONS[questionIndex], cb)
+}
+
+const addToList = (q) => {
+  // Successful recognition.
+  questionIndex = (questionIndex + 1) % QUESTIONS.length
+  const el = document.createElement('div')
+  el.innerHTML = '<span>' + q + '</span>'
+  listBox.appendChild(el)
+}
 
 document.querySelector('#start-button').onclick = function() {
-  console.log('Starting recognition...');
-
-  var listRaw = listBox.value
-  list = listRaw.split('\n')
-    .map(w => w.trim())
-    .filter(w => w != '')
-    .map(w => w.replace(/\.,$/, ''))
-  console.log('List analyzed:', list)
-
-  speak('Hello. Say okay and I will speak the first line.', function () {
+  askQuestion(() => {
     recognition.start();
+    console.log('Recognition started...');
     console.log('Listening...');
   })
 }
-
-var listIndex = -1;
 
 recognition.onresult = function(event) {
   // var word = event.results[0][0].transcript;
@@ -66,34 +89,25 @@ recognition.onresult = function(event) {
   var words = Array.prototype.map.call(latestResult, alt => alt.transcript)
 
   // Clean up
-  words = words.map(w => w.trim())
+  words = words.map(w => w.trim().toLowerCase())
 
   diagnostic.textContent = 'I heard: ' + words.toString();
   console.log(words)
   //if (words.indexOf('okay') !== -1 || words.indexOf('next' !== -1)) {
-  if (hasAny(words, ['okay', 'next'])) {
-    listIndex += 1
-
-    if (listIndex < list.length) {
-      let listItem = list[listIndex]
-      speak(listItem)
-    } else {
-      recognition.stop();
-      speak('List has ended. I will stop listening.')
-
-      return;
-    }
-  } else if (hasAny(words, ['again', 'repeat'])) {
-    if (listIndex >= 0) {
-      let listItem = list[listIndex]
-      speak(listItem)
-    }
-  } else if (hasAny(words, ['back', 'previous'])) {
-    listIndex = Math.max(0, listIndex - 1)
-    speak(list[listIndex])
-  } else if (hasAny(words, ['stop'])) {
+  if (hasAny(words, VOCABULARY_FOR_1)) {
+    addToList(1)
+    speak('positive, okay', askQuestion)
+  } else if (hasAny(words, VOCABULARY_FOR_0)) {
+    addToList(0)
+    speak('unknown, okay', askQuestion)
+  } else if (hasAny(words, VOCABULARY_FOR_T)) {
+    addToList(-1)
+    speak('negative, okay', askQuestion)
+  } else if (hasAny(words, VOCABULARY_FOR_ESC)) {
     recognition.stop()
     speak('I stopped listening you.')
+  } else {
+    speak('What?')
   }
 }
 
